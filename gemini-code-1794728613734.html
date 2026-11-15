@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VaultGuard - Secure Document Portal</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome untuk ikon -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="bg-slate-900 text-slate-100 min-h-screen flex flex-col">
+
+    <!-- LOGIN VIEW -->
+    <div id="login-view" class="flex-1 flex items-center justify-center p-4">
+        <div class="max-w-md w-full bg-slate-800 border border-slate-700 rounded-2xl shadow-xl p-8">
+            <div class="text-center mb-8">
+                <div class="inline-flex items-center justify-center w-16 h-16 bg-blue-600/20 text-blue-400 rounded-2xl mb-4 text-2xl">
+                    <i class="fa-solid fa-vault"></i>
+                </div>
+                <h1 class="text-2xl font-bold tracking-tight">VaultGuard Portal</h1>
+                <p class="text-slate-400 text-sm mt-1">Masukkan kredensial akun untuk mengakses brankas file Anda.</p>
+            </div>
+
+            <form id="login-form" onsubmit="handleLogin(event)" class="space-y-4">
+                <div>
+                    <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1">Username</label>
+                    <div class="relative">
+                        <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-slate-500"><i class="fa-solid fa-user"></i></span>
+                        <input type="text" id="username" required placeholder="Contoh: budi.santoso" class="w-full pl-10 pr-4 py-2.5 bg-slate-900 border border-slate-700 rounded-xl focus:outline-none focus:border-blue-500 text-sm">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1">Password</label>
+                    <div class="relative">
+                        <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-slate-500"><i class="fa-solid fa-lock"></i></span>
+                        <input type="password" id="password" required placeholder="••••••••" class="w-full pl-10 pr-4 py-2.5 bg-slate-900 border border-slate-700 rounded-xl focus:outline-none focus:border-blue-500 text-sm">
+                    </div>
+                </div>
+
+                <div id="login-error" class="hidden text-red-400 text-xs bg-red-950/50 border border-red-900 p-3 rounded-xl">
+                    Username atau password salah. Silakan periksa kembali.
+                </div>
+
+                <button type="submit" class="w-full py-3 bg-blue-600 hover:bg-blue-500 font-semibold rounded-xl transition shadow-lg shadow-blue-600/30 text-sm">
+                    Masuk ke Brankas
+                </button>
+            </form>
+
+            <div class="mt-8 pt-6 border-t border-slate-700/60 text-xs text-slate-400">
+                <p class="font-semibold text-slate-300 mb-2">Akun Simulasi Demo:</p>
+                <div class="grid grid-cols-1 gap-1.5 font-mono text-[11px] bg-slate-900/50 p-3 rounded-xl border border-slate-700/50">
+                    <div>👤 <strong>budi.santoso</strong> / pass: <span class="text-blue-400">budi123</span></div>
+                    <div>👤 <strong>siti.aminah</strong> / pass: <span class="text-blue-400">siti123</span></div>
+                    <div>👤 <strong>andi.wijaya</strong> / pass: <span class="text-blue-400">andi123</span></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- DASHBOARD VIEW (Hidden by default) -->
+    <div id="dashboard-view" class="hidden flex-1 flex flex-col">
+        <!-- Header -->
+        <header class="bg-slate-800/80 backdrop-blur border-b border-slate-700 sticky top-0 z-10">
+            <div class="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
+                <div class="flex items-center space-x-3">
+                    <div class="w-10 h-10 bg-blue-600 text-white rounded-xl flex items-center justify-center font-bold">
+                        <i class="fa-solid fa-vault"></i>
+                    </div>
+                    <div>
+                        <span class="font-bold tracking-tight text-lg">VaultGuard</span>
+                        <span class="text-xs bg-blue-500/20 text-blue-400 px-2 py-0.5 rounded-full ml-2 font-mono">Secure Vault</span>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <div class="text-right hidden sm:block">
+                        <div id="user-display-name" class="text-sm font-medium">Nama Pengguna</div>
+                        <div class="text-xs text-slate-400" id="user-display-role">Pengguna Terverifikasi</div>
+                    </div>
+                    <button onclick="handleLogout()" class="bg-slate-700 hover:bg-red-600/20 hover:text-red-400 hover:border-red-600/40 border border-slate-600 px-3.5 py-2 rounded-xl text-xs font-medium transition flex items-center space-x-2">
+                        <i class="fa-solid fa-right-from-bracket"></i>
+                        <span>Keluar</span>
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="flex-1 max-w-6xl w-full mx-auto px-4 py-8">
+            <!-- Welcome Banner -->
+            <div class="bg-gradient-to-r from-blue-900/40 to-slate-800 border border-blue-800/40 rounded-2xl p-6 mb-8 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+                <div>
+                    <h2 class="text-xl font-bold mb-1" id="welcome-title">Selamat Datang</h2>
+                    <p class="text-slate-300 text-sm">Berikut adalah dokumen dan arsip penting yang terikat khusus pada akun Anda.</p>
+                </div>
+                <div class="bg-slate-900/60 border border-slate-700 px-4 py-2.5 rounded-xl text-xs flex items-center space-x-3">
+                    <i class="fa-solid fa-shield-halved text-emerald-400 text-base"></i>
+                    <div>
+                        <div class="text-slate-400">Enkripsi Sesi</div>
+                        <div class="font-mono text-emerald-400 font-semibold">Aktif & Terisolasi</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Search & Filters -->
+            <div class="flex flex-col sm:flex-row gap-3 mb-6 justify-between items-center">
+                <div class="relative w-full sm:w-80">
+                    <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center text-slate-400"><i class="fa-solid fa-magnifying-glass"></i></span>
+                    <input type="text" id="search-input" oninput="filterFiles()" placeholder="Cari nama dokumen..." class="w-full pl-10 pr-4 py-2 bg-slate-800 border border-slate-700 rounded-xl text-sm focus:outline-none focus:border-blue-500">
+                </div>
+                <div class="text-xs text-slate-400 w-full sm:w-auto text-left sm:text-right" id="file-count-label">
+                    Menampilkan 0 file
+                </div>
+            </div>
+
+            <!-- File Grid / List -->
+            <div id="file-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                <!-- Data file akan dimuat secara dinamis via JavaScript -->
+            </div>
+        </main>
+    </div>
+
+    <!-- JavaScript Logika Data & Autentikasi -->
+    <script>
+        // Database Simulasi Dokumen per User
+        const database = {
+            "budi.santoso": {
+                name: "Budi Santoso",
+                role: "Mahasiswa / Departemen Akademik",
+                files: [
+                    { id: 1, name: "Transkrip Nilai Semester 4.pdf", category: "Akademik", size: "2.4 MB", date: "12 Okt 2025", icon: "fa-file-pdf", color: "text-red-400" },
+                    { id: 2, name: "Sertifikat Beasiswa Unggulan.pdf", category: "Sertifikat", size: "4.1 MB", date: "05 Jun 2025", icon: "fa-file-pdf", color: "text-red-400" },
+                    { id: 3, name: "Surat Pengantar Magang Kampus.docx", category: "Administrasi", size: "850 KB", date: "18 Jan 2026", icon: "fa-file-word", color: "text-blue-400" },
+                    { id: 4, name: "Proposal Skripsi Final.pdf", category: "Penelitian", size: "5.8 MB", date: "01 Nov 2026", icon: "fa-file-pdf", color: "text-red-400" }
+                ]
+            },
+            "siti.aminah": {
+                name: "Siti Aminah",
+                role: "Staff Administrasi Keuangan",
+                files: [
+                    { id: 101, name: "Laporan Anggaran Bulanan Q3.xlsx", category: "Keuangan", size: "3.2 MB", date: "01 Okt 2026", icon: "fa-file-excel", color: "text-emerald-400" },
+                    { id: 102, name: "SK Pengangkatan Pegawai 2026.pdf", category: "Legal", size: "1.9 MB", date: "15 Jan 2026", icon: "fa-file-pdf", color: "text-red-400" },
+                    { id: 103, name: "Slip Gaji Oktober 2026.pdf", category: "Keuangan", size: "520 KB", date: "28 Okt 2026", icon: "fa-file-pdf", color: "text-red-400" }
+                ]
+            },
+            "andi.wijaya": {
+                name: "Andi Wijaya",
+                role: "Divisi IT & Infrastruktur",
+                files: [
+                    { id: 201, name: "Kontrak Vendor Server Cloud.pdf", category: "Kontrak", size: "4.5 MB", date: "10 Feb 2026", icon: "fa-file-pdf", color: "text-red-400" },
+                    { id: 202, name: "Dokumentasi Network Topology.pdf", category: "Teknis", size: "12.4 MB", date: "14 Mar 2026", icon: "fa-file-pdf", color: "text-red-400" },
+                    { id: 203, name: "Akses Token & Kredensial API.txt", category: "Keamanan", size: "45 KB", date: "30 Okt 2026", icon: "fa-file-lines", color: "text-amber-400" }
+                ]
+            }
+        };
+
+        let currentUser = null;
+
+        function handleLogin(event) {
+            event.preventDefault();
+            const u = document.getElementById('username').value.trim().toLowerCase();
+            const p = document.getElementById('password').value;
+
+            // Simple hardcoded demo check (Password standar untuk demo: nama depan + 123)
+            const validPasswords = {
+                "budi.santoso": "budi123",
+                "siti.aminah": "siti123",
+                "andi.wijaya": "andi123"
+            };
+
+            if (database[u] && validPasswords[u] === p) {
+                currentUser = u;
+                document.getElementById('login-error').classList.add('hidden');
+                loadDashboard();
+            } else {
+                document.getElementById('login-error').classList.remove('hidden');
+            }
+        }
+
+        function loadDashboard() {
+            const userData = database[currentUser];
+            document.getElementById('login-view').classList.add('hidden');
+            document.getElementById('dashboard-view').classList.remove('hidden');
+            
+            document.getElementById('user-display-name').innerText = userData.name;
+            document.getElementById('user-display-role').innerText = userData.role;
+            document.getElementById('welcome-title').innerText = `Selamat Datang, ${userData.name}!`;
+
+            renderFiles(userData.files);
+        }
+
+        function renderFiles(filesToRender) {
+            const grid = document.getElementById('file-grid');
+            grid.innerHTML = '';
+
+            document.getElementById('file-count-label').innerText = `Menampilkan ${filesToRender.length} file`;
+
+            if (filesToRender.length === 0) {
+                grid.innerHTML = `<div class="col-span-full text-center py-12 text-slate-500 text-sm">Tidak ada dokumen yang cocok dengan pencarian.</div>`;
+                return;
+            }
+
+            filesToRender.forEach(file => {
+                grid.innerHTML += `
+                    <div class="bg-slate-800 border border-slate-700/80 rounded-2xl p-5 hover:border-slate-600 transition flex flex-col justify-between group">
+                        <div>
+                            <div class="flex items-start justify-between mb-3">
+                                <div class="w-10 h-10 rounded-xl bg-slate-900 border border-slate-700 flex items-center justify-center text-lg ${file.color}">
+                                    <i class="fa-solid ${file.icon}"></i>
+                                </div>
+                                <span class="text-[10px] uppercase tracking-wider font-semibold bg-slate-900 text-slate-400 px-2.5 py-1 rounded-lg border border-slate-700/60">${file.category}</span>
+                            </div>
+                            <h3 class="font-semibold text-sm mb-1 group-hover:text-blue-400 transition line-clamp-1">${file.name}</h3>
+                            <div class="text-xs text-slate-400 flex items-center space-x-3 mb-4">
+                                <span><i class="fa-solid fa-hard-drive mr-1"></i>${file.size}</span>
+                                <span><i class="fa-regular fa-calendar mr-1"></i>${file.date}</span>
+                            </div>
+                        </div>
+                        <button onclick="downloadFile('${file.name}')" class="w-full bg-slate-900 hover:bg-blue-600 hover:text-white text-slate-300 border border-slate-700 py-2 rounded-xl text-xs font-medium transition flex items-center justify-center space-x-2">
+                            <i class="fa-solid fa-download"></i>
+                            <span>Unduh Dokumen</span>
+                        </button>
+                    </div>
+                `;
+            });
+        }
+
+        function filterFiles() {
+            const keyword = document.getElementById('search-input').value.toLowerCase();
+            const userData = database[currentUser];
+            const filtered = userData.files.filter(f => f.name.toLowerCase().includes(keyword) || f.category.toLowerCase().includes(keyword));
+            renderFiles(filtered);
+        }
+
+        function downloadFile(fileName) {
+            alert(`Simulasi: Mengunduh file "${fileName}" secara aman dari server terisolasi.`);
+        }
+
+        function handleLogout() {
+            currentUser = null;
+            document.getElementById('username').value = '';
+            document.getElementById('password').value = '';
+            document.getElementById('dashboard-view').classList.add('hidden');
+            document.getElementById('login-view').classList.remove('hidden');
+        }
+    </script>
+</body>
+</html>
